@@ -51,7 +51,7 @@ with col1:
     
     if uploaded_file:
         st.success(f"✅ Loaded: {uploaded_file.name}")
-        st.image(uploaded_file, caption="Reference Image", use_container_width=True)
+        st.image(uploaded_file, caption="Reference Image", use_column_width=True)
 
     # 模型参数
     st.markdown("---")
@@ -112,11 +112,10 @@ with col2:
         st.balloons() # 撒花庆祝
         
         # 👇 这里是我为你准备的高清赛博朋克风格视频链接 👇
-        # 这个链接是公开的，不用登录也不用上传，直接就能播
         video_url = "https://videos.pexels.com/video-files/3121459/3121459-hd_1920_1080_25fps.mp4"
         
-        # 👇 关键修改：use_container_width=True (解决视频只显示一半的问题)
-        st.video(video_url, format="video/mp4", autoplay=True, use_container_width=True)
+        # 👇 修复点：使用最基础的参数，去除 autoplay，改用 use_column_width
+        st.video(video_url, format="video/mp4", use_column_width=True)
         
         # 底部展示一些模拟数据
         st.success(f"Video generated in 6.2s using {model}")
