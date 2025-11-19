@@ -1,40 +1,36 @@
 import streamlit as st
 import time
-import random
 
-# --- 1. 页面基础设置 ---
+# --- 1. 页面配置 ---
 st.set_page_config(
     page_title="GEMS Architecture Demo", 
     layout="wide", 
     page_icon="💎"
 )
 
-# --- 2. CSS 样式美化 ---
+# --- 2. 样式美化 ---
 st.markdown("""
 <style>
-    .stButton>button { 
-        width: 100%; 
-        border-radius: 8px; 
-        font-weight: bold; 
-        background-color: #FF4B4B; 
-        color: white;
-    }
+    .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; background-color: #FF4B4B; color: white;}
+    /* 隐藏视频播放器右上角的更多选项，看起来更像原生App */
+    video { outline: none; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. 顶部标题 ---
+# --- 3. 标题区域 ---
 st.title("💎 CN Open Source GEMS")
 st.markdown("### Next-Gen Video Generation Architecture")
 st.caption("Powered by **Vertex AI** | Orchestrated by **Gemini 2.0/3.0**")
 st.divider()
 
-# --- 4. 页面布局 ---
+# --- 4. 核心布局 ---
 col1, col2 = st.columns([1, 2])
 
-# === 左侧：用户控制区 ===
+# === 左侧：输入 ===
 with col1:
-    st.subheader("1. Input & Configuration")
+    st.subheader("1. Input & Context")
     
+    # 自动填入你的提示词
     user_prompt = st.text_area(
         "Creative Prompt", 
         "Cinematic shot of a futuristic coffee shop in Tokyo, neon lights, rain reflection, 4k resolution, slow motion.", 
@@ -42,93 +38,64 @@ with col1:
     )
 
     st.markdown("---")
-    st.markdown("**📄 Reference (Optional)**")
-    uploaded_file = st.file_uploader("Upload Storyboard/Image", type=['png', 'jpg', 'jpeg'])
-    
-    if uploaded_file:
-        st.success(f"✅ Loaded: {uploaded_file.name}")
-        # 注意：这里我也改成了最简单的写法，防止报错
-        st.image(uploaded_file, caption="Reference Image")
+    st.file_uploader("Upload Storyboard (Optional)", type=['png', 'jpg'])
 
     st.markdown("---")
     with st.expander("⚙️ Model Settings", expanded=True):
-        model = st.selectbox(
-            "Select LLM Backbone", 
-            ["Gemini 2.0 Flash (Experimental)", "Gemini 3.0 (Future Preview)", "Gemini 1.5 Pro"]
-        )
-        st.slider("Duration (seconds)", 5, 60, 15)
+        model = st.selectbox("Model", ["Gemini 3.0 (Preview)", "Gemini 2.0 Flash"])
+        st.slider("Duration", 5, 60, 15)
 
     run_btn = st.button("🚀 Generate Video", type="primary")
 
-# === 右侧：Agent 执行与视频展示 ===
+# === 右侧：结果 ===
 with col2:
-    st.subheader("2. Orchestrator & Result")
+    st.subheader("2. Real-time Generation")
     
     if run_btn:
-        with st.status(f"⚡ {model} Orchestrator Running...", expanded=True) as status:
-            
-            st.write("🧠 **Agent:** Analyzing prompt & constraints...")
+        # 模拟生成过程
+        with st.status(f"⚡ {model} Orchestrator Running...", expanded=True):
+            st.write("🧠 **Agent:** Decomposing prompt for temporal consistency...")
             time.sleep(1.0)
+            st.info("🎨 **Tool:** [Image Gen] Creating style reference (Cyberpunk/Neon)...")
+            time.sleep(1.0)
+            st.warning("🎥 **Tool:** [Video Model] Rendering latent frames...")
             
-            if uploaded_file:
-                st.info("📂 **Context:** Injecting user reference into latent space...")
-                time.sleep(1.0)
-            else:
-                st.warning("⚠️ **Context:** Generating storyboard from scratch...")
-                st.text("Scene 1: Neon Street (Wide)\nScene 2: Coffee Shop (Interior)")
-                time.sleep(0.8)
-            
-            st.info(f"🎨 **Tool:** [Image Gen] Creating consistency keyframes...")
-            c1, c2, c3 = st.columns(3)
-            with c1: st.image("https://picsum.photos/200/120?random=1", caption="Frame 1")
-            with c2: st.image("https://picsum.photos/200/120?random=2", caption="Frame 2")
-            with c3: st.image("https://picsum.photos/200/120?random=3", caption="Frame 3")
-            
-            time.sleep(1.5)
-            st.warning("🎥 **Tool:** [Video Model v3] Rendering high-fidelity output...")
-            
-            bar = st.progress(0, text="Rendering...")
+            # 进度条
+            bar = st.progress(0, text="Rendering 4K output...")
             for i in range(100):
-                time.sleep(0.01) 
+                time.sleep(0.02)
                 bar.progress(i+1)
-            
-            status.update(label="✅ Generation Complete!", state="complete", expanded=False)
         
-        # --- 视频播放区域 ---
+        # 结果展示
         st.divider()
-        st.subheader("✨ Final Generated Video")
         st.balloons()
+        st.success("✨ Video Generated Successfully!")
         
-        video_url = "https://videos.pexels.com/video-files/3121459/3121459-hd_1920_1080_25fps.mp4"
+        # ===============================================================
+        # 👇 这里我已经帮你填好了一个完美的在线视频链接，不用下载！ 👇
+        # 内容：雨夜、霓虹灯、赛博朋克风格
+        # ===============================================================
+        video_url = "https://assets.mixkit.co/videos/preview/mixkit-neon-lights-in-a-rainy-city-at-night-12305-large.mp4"
         
-        # 👇👇👇 终极修复 👇👇👇
-        # 我们删除了 format, use_column_width, autoplay 等所有参数
-        # 只保留最核心的 URL，这是最不容易出错的写法
+        # 播放视频 (使用最稳妥的参数)
         st.video(video_url)
         
-        st.success(f"Video generated in 6.2s using {model}")
+        # 显示技术参数
         with st.expander("View Technical Metadata"):
             st.json({
+                "prompt_adherence": "98.5%",
                 "resolution": "1920x1080",
-                "fps": 25,
-                "seed": 123456,
-                "cost": "$0.00"
+                "fps": 30,
+                "seed": 847201
             })
 
     else:
-        st.info("👈 Upload a storyboard (optional) and click Generate to start.")
+        # 默认等待状态
+        st.info("👈 Click 'Generate Video' to see the result.")
         st.markdown(
             """
-            <div style="
-                background-color:#f0f2f6; 
-                border-radius:10px; 
-                height: 300px; 
-                display:flex; 
-                align-items:center; 
-                justify-content:center; 
-                border: 2px dashed #ccc;
-                color: grey;">
-                <h3>Waiting for Instructions...</h3>
+            <div style="background-color:#f9f9f9; height:300px; border-radius:10px; display:flex; align-items:center; justify-content:center; border: 2px dashed #ddd; color:#aaa;">
+                <h3>Waiting for instructions...</h3>
             </div>
             """, 
             unsafe_allow_html=True
