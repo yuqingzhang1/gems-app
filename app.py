@@ -2,124 +2,125 @@ import streamlit as st
 import time
 import random
 
-# --- Page Configuration ---
+# --- 页面配置 ---
 st.set_page_config(
     page_title="GEMS Architecture Demo", 
     layout="wide", 
     page_icon="💎"
 )
 
-# --- Custom CSS for the "Pro" look ---
+# --- CSS 美化 ---
 st.markdown("""
 <style>
     .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; background-color: #FF4B4B; color: white;}
     .reportview-container { background: #ffffff; }
-    .status-box { border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- Top Header ---
+# --- 标题 ---
 st.title("💎 CN Open Source GEMS")
 st.markdown("### Next-Gen Video Generation Architecture")
 st.caption("Powered by **Vertex AI** | Orchestrated by **Gemini 2.0/3.0**")
 st.divider()
 
-# --- Layout ---
+# --- 布局 ---
 col1, col2 = st.columns([1, 2])
 
-# === LEFT COLUMN: User & Config ===
+# === 左侧：用户输入 & 故事板上传 ===
 with col1:
-    st.subheader("1. ADK Web (Input)")
+    st.subheader("1. Input & Context")
     
-    # User Input
+    # 提示词
     user_prompt = st.text_area(
         "Creative Prompt", 
         "Cinematic shot of a futuristic coffee shop in Tokyo, neon lights, rain reflection, 4k resolution.", 
-        height=120
+        height=100
     )
+
+    # 可选：上传故事板
+    st.markdown("---")
+    st.markdown("**📄 Reference Material (Optional)**")
+    uploaded_file = st.file_uploader("Upload Storyboard/Image", type=['png', 'jpg', 'jpeg'])
     
-    # Configuration with NEW MODELS
+    if uploaded_file is not None:
+        st.success(f"✅ Reference detected: {uploaded_file.name}")
+        st.image(uploaded_file, caption="User Reference", width=200)
+
+    # 模型配置
+    st.markdown("---")
     with st.expander("⚙️ Model Configuration", expanded=True):
-        # HERE ARE THE NEW MODELS YOU REQUESTED
         model = st.selectbox(
             "Select LLM Backbone", 
             ["Gemini 2.0 Flash (Experimental)", "Gemini 3.0 (Future Preview)", "Gemini 1.5 Pro"]
         )
-        
-        st.slider("Video Duration (sec)", 5, 60, 15)
-        st.selectbox("Aspect Ratio", ["16:9", "9:16", "1:1"])
 
-    st.info(f"🔌 Connected to: {model}")
-    
-    # Action Button
     run_btn = st.button("🚀 Generate Video", type="primary")
 
-# === RIGHT COLUMN: Process & Real Video ===
+# === 右侧：Agent 流程 & 真实视频 ===
 with col2:
     st.subheader("2. Orchestrator & Output")
     
     if run_btn:
-        # 1. Visualizing the Agent Logic
+        # 1. 模拟 Agent 思考过程
         with st.status(f"⚡ {model} Orchestrator Running...", expanded=True) as status:
             
-            # Step 1: Reasoning
-            st.write("🧠 **Agent:** Analyzing prompt semantics & visual requirements...")
-            time.sleep(1.0)
-            st.markdown("`Strategy: Cyberpunk Style -> High Contrast -> Fluid Motion`")
-            
-            # Step 2: Storyboard
+            st.write("🧠 **Agent:** Analyzing context...")
             time.sleep(0.8)
-            st.info("📝 **Tool:** [Storyboard Engine]")
-            st.text("Scene 1: Wide angle street view\nScene 2: Close up of neon sign\nScene 3: Steam rising from cup")
             
-            # Step 3: Image Gen (Gemini 2/3 capabilities)
-            time.sleep(1.2)
-            st.info(f"🎨 **Tool:** [Image Gen] (Powered by {model})")
-            # Showing thumbnails
+            # 分支逻辑：是否有上传图片
+            if uploaded_file is not None:
+                st.info("📂 **Context:** Integrating user storyboard into latent space...")
+                st.image(uploaded_file, width=150, caption="Reference Locked")
+                time.sleep(1.2)
+            else:
+                st.warning("⚠️ **Context:** Generating storyboard from scratch...")
+                time.sleep(0.8)
+                st.text("Scene 1: Establishing shot\nScene 2: Product close-up")
+            
+            st.info(f"🎨 **Tool:** [Image Gen] Generating Keyframes...")
+            # 模拟关键帧展示
             c1, c2, c3 = st.columns(3)
-            with c1: st.image("https://picsum.photos/150/100?random=1", caption="Keyframe A")
-            with c2: st.image("https://picsum.photos/150/100?random=2", caption="Keyframe B")
-            with c3: st.image("https://picsum.photos/150/100?random=3", caption="Keyframe C")
+            with c1: st.image("https://picsum.photos/200/120?random=10", caption="Frame 1")
+            with c2: st.image("https://picsum.photos/200/120?random=11", caption="Frame 2")
+            with c3: st.image("https://picsum.photos/200/120?random=12", caption="Frame 3")
             
-            # Step 4: Video Generation
-            time.sleep(2.0)
-            st.warning("🎥 **Tool:** [Video Generation Model v3]")
-            prog = st.progress(0, text="Rendering Latent Space...")
+            time.sleep(1.5)
+            st.warning("🎥 **Tool:** [Video Model v3] Rendering final output...")
+            
+            # 进度条模拟
+            bar = st.progress(0)
             for i in range(100):
-                time.sleep(0.01) # Fast render simulation
-                prog.progress(i+1)
+                time.sleep(0.01)
+                bar.progress(i+1)
             
             status.update(label="✅ Generation Complete!", state="complete", expanded=False)
         
-        # 2. THE REAL VIDEO OUTPUT
+        # 2. 展示真实视频
         st.divider()
-        st.subheader("✨ Final Generated Video")
-        st.balloons()
+        st.subheader("✨ Final Result")
+        st.balloons() # 撒花特效
         
-        # This plays a REAL video from a URL. 
-        # I selected a "Neon/City" stock video to match the prompt.
-        video_url = "https://videos.pexels.com/video-files/3121459/3121459-hd_1920_1080_25fps.mp4"
+        # ==========================================
+        # 👇👇👇 在这里替换你的视频链接 👇👇👇
+        # 如果你已经在 GitHub 上传了视频，右键该视频点击 "Copy Link" (如果是 Raw 链接最好)
+        # ==========================================
         
-        st.video(video_url, format="video/mp4", start_time=0)
+        # 这是一个看起来很像 AI 生成的赛博朋克视频 (默认备选)
+        default_video = "https://videos.pexels.com/video-files/3121459/3121459-hd_1920_1080_25fps.mp4"
         
-        st.success(f"Generated in 6.2s using {model}")
+        # 如果你要用自己的 GitHub 视频，格式如下：
+        # my_video = "https://github.com/你的用户名/仓库名/raw/main/文件名.mp4"
         
-        with st.expander("View Technical Metadata"):
-            st.json({
-                "model_version": model,
-                "resolution": "1920x1080",
-                "fps": 25,
-                "seed": 482910
-            })
+        st.video(default_video, format="video/mp4", autoplay=True)
+        
+        st.success("Video generated successfully based on your prompt.")
 
     else:
-        # Placeholder state
-        st.info("👈 Select 'Gemini 3.0' and click Generate to see the future.")
-        # A clean placeholder box
+        st.info("👈 Click Generate to start the demo.")
         st.markdown(
             """
-            <div style="background-color:#f0f2f6; padding:50px; border-radius:10px; text-align:center; color:grey;">
-                Waiting for input...
+            <div style="background-color:#f0f2f6; height: 300px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:grey;">
+                <h3>Waiting for Input...</h3>
             </div>
             """, 
             unsafe_allow_html=True
