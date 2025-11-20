@@ -21,7 +21,7 @@ st.markdown("""
 # --- 3. 标题区 ---
 st.title("💎 CN Open Source GEMS")
 st.markdown("### Single MCP Server Architecture Implementation")
-st.caption("Orchestrator: **Gemini** | Protocol: **MCP** | Tools: **Vertex AI**")
+st.caption("Orchestrator: **Gemini** | Protocol: **MCP** | Video Backbone: **Veo**")
 st.divider()
 
 col1, col2 = st.columns([1, 2])
@@ -30,13 +30,13 @@ col1, col2 = st.columns([1, 2])
 with col1:
     st.subheader("1. System Configuration")
     
-    # A. 场景选择 (对应 Use Case)
+    # A. 场景选择
     scenario = st.selectbox(
         "🎯 Select Scenario (System Prompt)", 
         ["Creative Factory (General)", "Hotel Story (Enterprise Demo)", "E-commerce Ads"]
     )
     
-    # B. 模型选择 (这里加入了 Gemini 3.0)
+    # B. 模型选择 (包含 Gemini 3.0)
     st.markdown("---")
     model = st.selectbox(
         "🧠 Select LLM Backend", 
@@ -59,7 +59,6 @@ with col1:
     st.markdown("---")
     user_prompt = st.text_area("User Instruction", default_prompt, height=100)
     
-    # 可选上传
     st.file_uploader("Upload Context (Optional)", type=['png', 'jpg'])
 
     run_btn = st.button("🚀 Submit Task", type="primary")
@@ -69,43 +68,53 @@ with col2:
     st.subheader("2. Orchestrator Execution Log")
     
     if run_btn:
-        # 模拟任务 ID
         task_id = "TASK-" + str(int(time.time()))
-        st.info(f"✅ Request Received via Vertex AI Endpoint. Task ID: **{task_id}**")
+        st.info(f"✅ Request Received via Vertex AI. Task ID: **{task_id}**")
         
         # 模拟 MCP 交互过程
         with st.status(f"⚡ Orchestrating via MCP ({model})...", expanded=True) as status:
             
-            # Step 1: 加载 System Prompt
+            # Step 1: System Prompt
             st.write(f"🧠 **Orchestrator:** Loading System Prompt for `{scenario}`...")
             time.sleep(0.8)
             
-            # Step 2: 意图识别
+            # Step 2: 意图识别 (明确计划使用 Veo)
             st.write("🔍 **Intent Analysis:**")
             st.markdown(f"""
             ```json
-            {{ "model": "{model}", "intent": "video_generation", "steps": ["storyboard", "image", "video"] }}
+            {{ "model": "{model}", "intent": "video_generation", "target_model": "veo-latest" }}
             ```
             """)
             time.sleep(1.0)
             
-            # Step 3: 工具调用
+            # Step 3: Imagen 调用
             st.write("🛠️ **MCP Call:** `tool:vertex_imagen_3`")
             st.markdown(f"""
             ```json
             {{ "prompt": "{user_prompt[:30]}...", "aspect_ratio": "16:9" }}
             ```
             """)
-            
-            # 显示假图片
             c1, c2 = st.columns(2)
             with c1: st.image("https://picsum.photos/200/110?random=1", caption="Asset_A generated")
             with c2: st.image("https://picsum.photos/200/110?random=2", caption="Asset_B generated")
             time.sleep(1.5)
             
-            # Step 4: 视频生成 (模拟异步/延迟)
-            st.warning("🎥 **MCP Call:** `tool:video_model_v2` (Async Job Submitted)")
-            bar = st.progress(0, text="Waiting for GPU cluster...")
+            # Step 4: Veo 调用 (这里是重点更新！)
+            st.warning("🎥 **MCP Call:** `tool:vertex_veo` (High-Fidelity Video Gen)")
+            
+            # 展示 Veo 的参数，显得很专业
+            st.markdown("""
+            ```json
+            {
+              "model_id": "veo-001",
+              "mode": "image_to_video",
+              "resolution": "1080p",
+              "frames": 24
+            }
+            ```
+            """)
+            
+            bar = st.progress(0, text="Veo is rendering latent space...")
             for i in range(100):
                 time.sleep(0.015) 
                 bar.progress(i+1)
@@ -116,20 +125,19 @@ with col2:
         st.divider()
         st.success("✨ Task Completed Successfully")
         
-        # 播放视频逻辑
         video_filename = "demo.mp4" 
         if os.path.exists(video_filename):
             st.video(video_filename)
         else:
-            # 兜底网络视频
             st.video("https://assets.mixkit.co/videos/preview/mixkit-neon-lights-in-a-rainy-city-at-night-12305-large.mp4")
             
         with st.expander("View Trace Logs"):
             st.json({
                 "task_id": task_id, 
                 "backend": model,
+                "video_model": "Google Veo (Preview)",
                 "latency": "4.2s (Simulated)", 
-                "cost": "$0.12"
+                "cost": "$0.18"
             })
 
     else:
