@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 import os
+import json
 
 # --- 1. 页面配置 ---
 st.set_page_config(
@@ -9,78 +10,118 @@ st.set_page_config(
     page_icon="💎"
 )
 
-# --- 2. 样式美化 ---
+# --- 2. 样式 ---
 st.markdown("""
 <style>
-    .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; background-color: #FF4B4B; color: white;}
+    .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; background-color: #1E88E5; color: white;}
+    .json-box { font-family: monospace; font-size: 12px; background: #f0f0f0; padding: 10px; border-radius: 5px; }
 </style>
 """, unsafe_allow_html=True)
 
 # --- 3. 标题 ---
 st.title("💎 CN Open Source GEMS")
-st.markdown("### Next-Gen Video Generation Architecture")
-st.caption("Powered by **Vertex AI** | Orchestrated by **Gemini 2.0/3.0**")
+st.markdown("### Single MCP Server Architecture Implementation")
+st.caption("Orchestrator: **Gemini 2.0** | Protocol: **MCP** | Tools: **Vertex AI**")
 st.divider()
 
-# --- 4. 布局 ---
 col1, col2 = st.columns([1, 2])
 
-# === 左侧 ===
+# === 左侧：配置区 (Updated) ===
 with col1:
-    st.subheader("1. Input & Context")
-    user_prompt = st.text_area(
-        "Creative Prompt", 
-        "Cinematic shot of a futuristic coffee shop in Tokyo, neon lights, rain reflection, 4k resolution.", 
-        height=120
+    st.subheader("1. System Configuration")
+    
+    # [NEW] 场景选择 (响应录音里的 Use Case)
+    scenario = st.selectbox(
+        "🎯 Select Scenario (System Prompt)", 
+        ["Creative Factory (General)", "Hotel Story (Enterprise Demo)", "E-commerce Ads"]
     )
-    st.markdown("---")
-    st.file_uploader("Upload Storyboard (Optional)", type=['png', 'jpg'])
-    st.markdown("---")
-    model = st.selectbox("Model", ["Gemini 3.0 (Preview)", "Gemini 2.0 Flash"])
-    run_btn = st.button("🚀 Generate Video", type="primary")
+    
+    # 根据场景自动变 Prompt
+    default_prompt = ""
+    if "Hotel" in scenario:
+        default_prompt = "Generate a luxury hotel promotion video featuring a pool, fine dining, and ocean view."
+    else:
+        default_prompt = "Cinematic shot of a futuristic coffee shop in Tokyo, neon lights, rain reflection, 4k resolution."
+        
+    user_prompt = st.text_area("User Instruction", default_prompt, height=100)
 
-# === 右侧 ===
+    st.markdown("---")
+    st.file_uploader("Upload Context (Optional)", type=['png', 'jpg'])
+    
+    with st.expander("🔧 Advanced Settings (MCP)", expanded=False):
+        st.selectbox("LLM Backend", ["Gemini 2.0 Flash", "Gemini 1.5 Pro"])
+        st.checkbox("Force Vertex AI Endpoint", value=True, disabled=True)
+
+    run_btn = st.button("🚀 Submit Task", type="primary")
+
+# === 右侧：执行区 (Updated) ===
 with col2:
-    st.subheader("2. Real-time Generation")
+    st.subheader("2. Orchestrator Execution Log")
     
     if run_btn:
-        # 模拟 Agent 运行
-        with st.status(f"⚡ {model} Orchestrator Running...", expanded=True):
-            st.write("🧠 **Agent:** Analyzing prompt...")
-            time.sleep(0.5)
-            st.write("🎨 **Tool:** [Image Gen] Creating frames...")
-            time.sleep(0.5)
-            st.write("🎥 **Tool:** [Video Model] Rendering output...")
-            time.sleep(0.5)
+        # [NEW] 模拟任务提交回执
+        task_id = "TASK-" + str(int(time.time()))
+        st.info(f"✅ Request Received. Task ID: **{task_id}**")
+        
+        # 模拟 MCP 交互过程
+        with st.status("⚡ Orchestrating via MCP...", expanded=True) as status:
             
+            # Step 1: 加载 System Prompt
+            st.write("🧠 **Orchestrator:** Loading System Prompt for `" + scenario + "`...")
+            time.sleep(0.8)
+            
+            # Step 2: 意图识别 (显示 JSON)
+            st.write("🔍 **Intent Analysis:**")
+            st.markdown(f"""
+            ```json
+            {{ "intent": "video_generation", "style": "cinematic", "steps": ["storyboard", "image", "video"] }}
+            ```
+            """)
+            time.sleep(1.0)
+            
+            # Step 3: 工具调用 (MCP Protocol 风格)
+            st.write("🛠️ **MCP Call:** `tool:vertex_imagen_3`")
+            st.markdown(f"""
+            ```json
+            {{ "prompt": "{user_prompt[:30]}...", "aspect_ratio": "16:9" }}
+            ```
+            """)
+            # 显示假图片
+            c1, c2 = st.columns(2)
+            with c1: st.image("https://picsum.photos/200/110?random=1", caption="Asset_A generated")
+            with c2: st.image("https://picsum.photos/200/110?random=2", caption="Asset_B generated")
+            time.sleep(1.5)
+            
+            # Step 4: 视频生成 (模拟高延迟)
+            st.warning("🎥 **MCP Call:** `tool:video_model_v2` (Async Processing...)")
+            bar = st.progress(0, text="Waiting for GPU cluster...")
+            for i in range(100):
+                time.sleep(0.015) 
+                bar.progress(i+1)
+            
+            status.update(label="✅ Workflow Completed!", state="complete", expanded=False)
+        
+        # --- 结果展示 ---
         st.divider()
-        st.balloons()
-        st.success("✨ Video Generated Successfully!")
+        st.success("✨ Task Completed Successfully")
         
-        # ===========================================================
-        # 👇👇👇 核心修改在这里 👇👇👇
-        # 因为你已经把视频传到了仓库里，直接写文件名即可！
-        # Streamlit 会自动在当前目录下找这个文件。
-        # ===========================================================
-        video_filename = "demo.mp4"
-        
-        # 检查文件是否存在 (防止你文件名写错)
+        # 播放本地视频 (请确保你上传了 demo.mp4)
+        video_filename = "demo.mp4" 
         if os.path.exists(video_filename):
             st.video(video_filename)
-            
-            with st.expander("View Technical Metadata"):
-                st.json({"file": video_filename, "status": "Local Render", "fps": 30})
         else:
-            st.error(f"❌ 找不到视频文件: {video_filename}")
-            st.warning("请确认你已经把视频上传到了 GitHub，并且名字完全一样（叫 demo.mp4）。")
+            # 如果没上传，用网络视频兜底
+            st.video("https://assets.mixkit.co/videos/preview/mixkit-neon-lights-in-a-rainy-city-at-night-12305-large.mp4")
+            
+        with st.expander("View Trace Logs"):
+            st.json({"task_id": task_id, "latency": "4.2s (Simulated)", "cost": "$0.12"})
 
     else:
-        st.info("👈 Click 'Generate Video' to start.")
-        # 占位图
+        st.info("👈 Configure scenario and submit task to start.")
         st.markdown(
             """
-            <div style="background-color:#f0f2f6; height:300px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:grey;">
-                <h3>Waiting for instructions...</h3>
+            <div style="background-color:#f9f9f9; height:250px; border-radius:10px; display:flex; align-items:center; justify-content:center; border: 2px dashed #ddd; color:#aaa;">
+                <h3>Waiting for Input...</h3>
             </div>
             """, 
             unsafe_allow_html=True
