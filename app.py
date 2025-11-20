@@ -15,142 +15,149 @@ st.markdown("""
 <style>
     .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; background-color: #1E88E5; color: white;}
     .json-box { font-family: monospace; font-size: 12px; background: #f0f0f0; padding: 10px; border-radius: 5px; }
+    /* 评估通过/失败的样式 */
+    .pass-badge { background-color: #e6fffa; color: #047857; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
+    .warn-badge { background-color: #fffbeb; color: #b45309; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
 </style>
 """, unsafe_allow_html=True)
 
 # --- 3. 标题区 ---
 st.title("💎 CN Open Source GEMS")
-st.markdown("### Single MCP Server Architecture Implementation")
-st.caption("Orchestrator: **Gemini** | Protocol: **MCP** | Video Backbone: **Veo**")
+st.markdown("### Single MCP Server: Full-Cycle Creative Factory")
+st.caption("Orchestrator: **Gemini** | Insights: **YouTrendsLM** | Video: **Veo** | Audio: **Lyria/TTS** | Editing: **Vids**")
 st.divider()
 
 col1, col2 = st.columns([1, 2])
 
-# === 左侧：配置区 ===
+# === 左侧：高级输入配置 ===
 with col1:
-    st.subheader("1. System Configuration")
+    st.subheader("1. Creative Input & Strategy")
     
-    # A. 场景选择
+    # A. 场景与策略
     scenario = st.selectbox(
-        "🎯 Select Scenario (System Prompt)", 
-        ["Creative Factory (General)", "Hotel Story (Enterprise Demo)", "E-commerce Ads"]
+        "🎯 Campaign Scenario", 
+        ["Hotel Story (Luxury)", "E-commerce (Fashion)", "YouTrends Best Practice (Viral)"]
     )
     
-    # B. 模型选择 (包含 Gemini 3.0)
-    st.markdown("---")
-    model = st.selectbox(
-        "🧠 Select LLM Backend", 
-        [
-            "Gemini 3.0 (Future Preview)", 
-            "Gemini 2.0 Flash (Experimental)", 
-            "Gemini 1.5 Pro (Production)"
-        ]
-    )
+    # B. 策略工具开关 (新功能)
+    st.markdown("**🧠 Strategy Engines**")
+    use_youtrends = st.checkbox("Enable YouTrendsLM Insight / ABCD Framework", value=True)
+    use_style_picker = st.selectbox("Style Picker", ["Manual Gemini Prompt", "Match Brand Guidelines"])
     
-    # 根据场景自动变 Prompt
-    default_prompt = ""
-    if "Hotel" in scenario:
-        default_prompt = "Generate a luxury hotel promotion video featuring a pool, fine dining, and ocean view."
-    elif "E-commerce" in scenario:
-        default_prompt = "Create a 15s ad for a new running shoe, dynamic shots, upbeat music."
-    else:
-        default_prompt = "Cinematic shot of a futuristic coffee shop in Tokyo, neon lights, rain reflection, 4k resolution."
-        
     st.markdown("---")
-    user_prompt = st.text_area("User Instruction", default_prompt, height=100)
     
-    st.file_uploader("Upload Context (Optional)", type=['png', 'jpg'])
+    # C. 创作输入
+    user_prompt = st.text_area("Creative Prompt / Script", "Cinematic shot of a futuristic coffee shop in Tokyo, neon lights, rain reflection, 4k resolution.", height=100)
+    st.file_uploader("Upload Creative Asset (Image/Video)", type=['png', 'jpg', 'mp4'])
+    
+    st.markdown("---")
+    
+    # D. 音频与剪辑 (新功能)
+    with st.expander("🎵 Audio & Editing Settings", expanded=False):
+        st.checkbox("Generate VO (Vertex TTS)", value=True)
+        st.checkbox("Generate Music/SFX (Lyria)", value=True)
+        st.selectbox("Video Editing Mode", ["Vids AI Auto-Edit", "Manual Shot Length"])
 
-    run_btn = st.button("🚀 Submit Task", type="primary")
+    run_btn = st.button("🚀 Start Creative Factory", type="primary")
 
-# === 右侧：执行区 ===
+# === 右侧：执行与评估 ===
 with col2:
-    st.subheader("2. Orchestrator Execution Log")
+    st.subheader("2. Orchestration & Agents Trace")
     
     if run_btn:
-        task_id = "TASK-" + str(int(time.time()))
-        st.info(f"✅ Request Received via Vertex AI. Task ID: **{task_id}**")
+        task_id = "JOB-" + str(int(time.time()))
+        st.info(f"✅ Job Submitted to Vertex AI. ID: **{task_id}**")
         
         # 模拟 MCP 交互过程
-        with st.status(f"⚡ Orchestrating via MCP ({model})...", expanded=True) as status:
+        with st.status(f"⚡ Orchestrating Workflow...", expanded=True) as status:
             
-            # Step 1: System Prompt
-            st.write(f"🧠 **Orchestrator:** Loading System Prompt for `{scenario}`...")
-            time.sleep(0.8)
+            # Phase 1: Insight & Strategy (YouTrendsLM)
+            if use_youtrends:
+                st.write("🧠 **Agent:** Calling `tool:youtrends_lm` for ABCD analysis...")
+                time.sleep(0.8)
+                st.markdown("> *Insight: Enhance color saturation for mobile retention. Add text overlay in first 2s.*")
             
-            # Step 2: 意图识别
-            st.write("🔍 **Intent Analysis:**")
-            st.markdown(f"""
-            ```json
-            {{ "model": "{model}", "intent": "video_generation", "target_model": "veo-latest" }}
-            ```
-            """)
-            time.sleep(1.0)
+            # Phase 2: Visual Creation (Imagen + Veo)
+            st.write("🎨 **Agent:** Generating Assets (NanoBanana/GemPix)...")
+            time.sleep(0.5)
+            st.write("🎥 **Agent:** Rendering Video (Veo3 Fast in Flow)...")
+            # 模拟 Veo 进度
+            bar = st.progress(0, text="Veo Rendering...")
+            for i in range(50): 
+                time.sleep(0.01)
+                bar.progress(i*2)
             
-            # Step 3: Imagen 调用 (已修改：只显示一张你上传的图)
-            st.write("🛠️ **MCP Call:** `tool:vertex_imagen_3`")
-            st.markdown(f"""
-            ```json
-            {{ "prompt": "{user_prompt[:30]}...", "aspect_ratio": "16:9" }}
-            ```
-            """)
+            # Phase 3: Audio & Editing (新环节)
+            st.write("🎵 **Agent:** Synthesizing Audio (`tool:vertex_tts` + `tool:lyria`)...")
+            time.sleep(0.5)
+            st.write("✂️ **Agent:** Assembling Timeline (`tool:google_vids`)...")
+            time.sleep(0.5)
             
-            # --- 核心修改：显示你上传的 generated_image.jpg ---
+            # Phase 4: Evaluation Agents (新环节 - 核心亮点)
+            st.warning("🕵️ **Eval Swarm:** Running Objective & Subjective Agents...")
+            st.markdown("`> Running: Japanese Spoken Checker...`")
+            time.sleep(0.3)
+            st.markdown("`> Running: Human Accuracy (Hand/Face) Checker...`")
+            time.sleep(0.3)
+            st.markdown("`> Running: ABCD Best Practice Evaluator...`")
+            
+            status.update(label="✅ All Agents Completed!", state="complete", expanded=False)
+        
+        # --- 结果展示区 (使用 Tabs 分离视频和评估报告) ---
+        st.divider()
+        st.balloons()
+        
+        tab_video, tab_eval, tab_debug = st.tabs(["🎬 Final Output", "📊 Eval Report", "🛠️ Trace Logs"])
+        
+        with tab_video:
+            st.success("✨ Final Creative Asset Ready")
+            # 视频播放逻辑
+            video_filename = "demo.mp4" 
             image_filename = "generated_image.jpg"
             
-            if os.path.exists(image_filename):
-                # 显示本地上传的图片，宽度设置适中
-                st.image(image_filename, caption="✅ Generated Asset (Imagen 3)", width=500)
+            if os.path.exists(video_filename):
+                st.video(video_filename)
             else:
-                # 如果你还没上传，显示一个占位图并提示
-                st.warning("⚠️ 请上传名为 generated_image.jpg 的图片到 GitHub")
-                st.image("https://picsum.photos/500/280", caption="Placeholder Asset")
+                st.video("https://assets.mixkit.co/videos/preview/mixkit-neon-lights-in-a-rainy-city-at-night-12305-large.mp4")
+                
+        with tab_eval:
+            st.subheader("Automated Evaluation Report")
+            st.info("Generated by Gemini 1.5 Pro Vision & Audio Analysis")
             
-            time.sleep(1.5)
+            # 模拟图片中的 Evaluation Agents 结果
+            col_e1, col_e2 = st.columns(2)
             
-            # Step 4: Veo 调用
-            st.warning("🎥 **MCP Call:** `tool:vertex_veo` (High-Fidelity Video Gen)")
-            
-            # 展示 Veo 的参数
-            st.markdown("""
-            ```json
-            {
-              "model_id": "veo-001",
-              "mode": "image_to_video",
-              "resolution": "1080p",
-              "frames": 24
-            }
-            ```
-            """)
-            
-            bar = st.progress(0, text="Veo is rendering latent space...")
-            for i in range(100):
-                time.sleep(0.015) 
-                bar.progress(i+1)
-            
-            status.update(label="✅ Workflow Completed!", state="complete", expanded=False)
-        
-        # --- 结果展示 ---
-        st.divider()
-        st.success("✨ Task Completed Successfully")
-        
-        video_filename = "demo.mp4" 
-        if os.path.exists(video_filename):
-            st.video(video_filename)
-        else:
-            st.video("https://assets.mixkit.co/videos/preview/mixkit-neon-lights-in-a-rainy-city-at-night-12305-large.mp4")
-            
-        with st.expander("View Trace Logs"):
+            with col_e1:
+                st.markdown("### Objective Eval Agents")
+                st.markdown("""
+                | Agent | Status | Note |
+                | :--- | :--- | :--- |
+                | **Spoken Language Checker** | <span class="pass-badge">PASS</span> | Pronunciation accuracy 99.2% |
+                | **Written Word Checker** | <span class="pass-badge">PASS</span> | No Kanji errors detected |
+                | **Human Accuracy** | <span class="warn-badge">WARN</span> | Minor finger anomaly in frame 142 |
+                | **Animation Quality** | <span class="pass-badge">PASS</span> | Lip-sync latency < 20ms |
+                """, unsafe_allow_html=True)
+                
+            with col_e2:
+                st.markdown("### Subjective Eval Agents")
+                st.markdown("""
+                | Agent | Status | Insight |
+                | :--- | :--- | :--- |
+                | **Shot Length Agent** | <span class="pass-badge">PASS</span> | Pacing matches "Upbeat" style |
+                | **Copywriter Agent** | <span class="warn-badge">SUGGEST</span> | "Consider shortening opening hook" |
+                | **ABCD Framework** | <span class="pass-badge">PASS</span> | Branding present in first 5s |
+                """, unsafe_allow_html=True)
+
+        with tab_debug:
             st.json({
-                "task_id": task_id, 
-                "backend": model,
-                "video_model": "Google Veo (Preview)",
-                "latency": "4.2s (Simulated)", 
-                "cost": "$0.18"
+                "task_id": task_id,
+                "modules": ["YouTrendsLM", "Imagen3", "Veo", "Lyria", "Vids"],
+                "eval_score": "A-",
+                "cost": "$0.42"
             })
 
     else:
-        st.info("👈 Select a Scenario & Model, then submit.")
+        st.info("👈 Configure Strategy & Creative Input to start.")
         st.markdown(
             """
             <div style="background-color:#f9f9f9; height:250px; border-radius:10px; display:flex; align-items:center; justify-content:center; border: 2px dashed #ddd; color:#aaa;">
