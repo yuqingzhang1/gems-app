@@ -78,7 +78,7 @@ with col2:
             st.write(f"🧠 **Orchestrator:** Loading System Prompt for `{scenario}`...")
             time.sleep(0.8)
             
-            # Step 2: 意图识别 (明确计划使用 Veo)
+            # Step 2: 意图识别
             st.write("🔍 **Intent Analysis:**")
             st.markdown(f"""
             ```json
@@ -87,22 +87,31 @@ with col2:
             """)
             time.sleep(1.0)
             
-            # Step 3: Imagen 调用
+            # Step 3: Imagen 调用 (已修改：只显示一张你上传的图)
             st.write("🛠️ **MCP Call:** `tool:vertex_imagen_3`")
             st.markdown(f"""
             ```json
             {{ "prompt": "{user_prompt[:30]}...", "aspect_ratio": "16:9" }}
             ```
             """)
-            c1, c2 = st.columns(2)
-            with c1: st.image("https://picsum.photos/200/110?random=1", caption="Asset_A generated")
-            with c2: st.image("https://picsum.photos/200/110?random=2", caption="Asset_B generated")
+            
+            # --- 核心修改：显示你上传的 generated_image.jpg ---
+            image_filename = "generated_image.jpg"
+            
+            if os.path.exists(image_filename):
+                # 显示本地上传的图片，宽度设置适中
+                st.image(image_filename, caption="✅ Generated Asset (Imagen 3)", width=500)
+            else:
+                # 如果你还没上传，显示一个占位图并提示
+                st.warning("⚠️ 请上传名为 generated_image.jpg 的图片到 GitHub")
+                st.image("https://picsum.photos/500/280", caption="Placeholder Asset")
+            
             time.sleep(1.5)
             
-            # Step 4: Veo 调用 (这里是重点更新！)
+            # Step 4: Veo 调用
             st.warning("🎥 **MCP Call:** `tool:vertex_veo` (High-Fidelity Video Gen)")
             
-            # 展示 Veo 的参数，显得很专业
+            # 展示 Veo 的参数
             st.markdown("""
             ```json
             {
